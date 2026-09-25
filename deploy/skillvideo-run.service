@@ -1,0 +1,20 @@
+# Claude Code Skill 技術探討：每日製作隔天兩集影片（systemd user unit）
+# 安裝：複製到 ~/.config/systemd/user/，並執行 loginctl enable-linger <使用者> 讓登出後仍會執行
+# 機密不經 EnvironmentFile 注入（那會讓所有子程序都繼承）；程式自行以白名單載入 repo 內的 .env
+# user unit 無法可靠依賴 network-online.target，網路未就緒由程式內重試處理
+[Unit]
+Description=Claude Code Skill 技術探討：製作隔天 02:00 / 14:00 兩集影片
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/claude-code-skill-video
+Environment=PYTHONUTF8=1
+# user unit 的 PATH 不含 ~/.local/bin，claude CLI 常裝在那裡
+Environment=PATH=%h/.local/bin:%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/claude-code-skill-video/.venv/bin/python -m skillvideo.run_daily run
+# 兩集含 claude 腳本、TTS、ffmpeg 合成與上傳，保守給 2 小時
+TimeoutStartSec=2h
+Nice=5
+
+[Install]
+WantedBy=default.target

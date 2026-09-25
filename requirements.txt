@@ -1,0 +1,9 @@
+# Claude Code Skill 技術探討：每日自動影片
+edge-tts>=6.1
+Pillow>=10.0
+google-api-python-client>=2.100
+google-auth>=2.23
+google-auth-oauthlib>=1.1
+google-auth-httplib2>=0.1
+# 測試
+pytest>=8.0

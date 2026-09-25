@@ -1,0 +1,13 @@
+# 每天 20:00 製作，22:00、00:00 補跑（冪等：已排程的 slot 會自動跳過）
+[Unit]
+Description=Claude Code Skill 技術探討：每日製作排程（20:00 / 22:00 / 00:00 台北）
+
+[Timer]
+OnCalendar=*-*-* 20:00:00 Asia/Taipei
+OnCalendar=*-*-* 22:00:00 Asia/Taipei
+OnCalendar=*-*-* 00:00:00 Asia/Taipei
+Persistent=true
+Unit=skillvideo-run.service
+
+[Install]
+WantedBy=timers.target

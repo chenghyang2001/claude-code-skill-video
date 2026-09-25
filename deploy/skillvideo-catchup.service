@@ -1,0 +1,16 @@
+# Claude Code Skill 技術探討：白天補救（只補今天尚未過、尚未排程的 slot，例如 14:00）
+# 機密由程式白名單載入 .env；網路未就緒由程式內重試處理
+[Unit]
+Description=Claude Code Skill 技術探討：補救今天尚未排程的 slot
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/claude-code-skill-video
+Environment=PYTHONUTF8=1
+Environment=PATH=%h/.local/bin:%h/.npm-global/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/claude-code-skill-video/.venv/bin/python -m skillvideo.run_daily run --catch-up
+TimeoutStartSec=1h
+Nice=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,12 @@
+# 每天 02:30、14:30 驗證剛公開的集數（未驗證的 API 專案可能把影片鎖成私人）
+[Unit]
+Description=Claude Code Skill 技術探討：公開後驗證排程（02:30 / 14:30 台北）
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 Asia/Taipei
+OnCalendar=*-*-* 14:30:00 Asia/Taipei
+Persistent=true
+Unit=skillvideo-verify.service
+
+[Install]
+WantedBy=timers.target

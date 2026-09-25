@@ -1,0 +1,11 @@
+# 每天 08:00 補救：若前一晚三次都失敗，仍有機會趕上當天 14:00
+[Unit]
+Description=Claude Code Skill 技術探討：白天補救排程（08:00 台北）
+
+[Timer]
+OnCalendar=*-*-* 08:00:00 Asia/Taipei
+Persistent=true
+Unit=skillvideo-catchup.service
+
+[Install]
+WantedBy=timers.target

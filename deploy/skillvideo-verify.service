@@ -1,0 +1,14 @@
+# Claude Code Skill 技術探討：公開後驗證（確認 publishAt 到點後真的變成 public）
+# 機密由程式白名單載入 .env；網路未就緒由程式內重試處理
+[Unit]
+Description=Claude Code Skill 技術探討：公開後驗證
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/claude-code-skill-video
+Environment=PYTHONUTF8=1
+ExecStart=%h/claude-code-skill-video/.venv/bin/python -m skillvideo.run_daily verify
+TimeoutStartSec=15min
+
+[Install]
+WantedBy=default.target
