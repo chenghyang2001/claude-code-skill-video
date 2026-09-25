@@ -1,0 +1,972 @@
+[
+ {
+  "ep": 1,
+  "skills": [
+   {
+    "id": "09-11",
+    "name": "paperjsx",
+    "status": "✅",
+    "demo_md": "doc/demos/09-11-paperjsx.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 2,
+  "skills": [
+   {
+    "id": "10-11",
+    "name": "frontend-design",
+    "status": "✅",
+    "demo_md": "doc/demos/10-11-frontend-design.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 3,
+  "skills": [
+   {
+    "id": "09-10",
+    "name": "mcp-builder",
+    "status": "✅",
+    "demo_md": "doc/demos/09-10-mcp-builder.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 4,
+  "skills": [
+   {
+    "id": "07-08",
+    "name": "slack-gif-creator",
+    "status": "✅",
+    "demo_md": "doc/demos/07-08-slack-gif-creator.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 5,
+  "skills": [
+   {
+    "id": "10-19",
+    "name": "ralph-loop",
+    "status": "✅",
+    "demo_md": "doc/demos/10-19-ralph-loop.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 6,
+  "skills": [
+   {
+    "id": "10-10",
+    "name": "feature-dev",
+    "status": "✅",
+    "demo_md": "doc/demos/10-10-feature-dev.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 7,
+  "skills": [
+   {
+    "id": "10-05",
+    "name": "code-review",
+    "status": "✅",
+    "demo_md": "doc/demos/10-05-code-review.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 8,
+  "skills": [
+   {
+    "id": "09-09",
+    "name": "lead-research-assistant",
+    "status": "✅",
+    "demo_md": "doc/demos/09-09-lead-research-assistant.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 9,
+  "skills": [
+   {
+    "id": "11-12",
+    "name": "playwright",
+    "status": "✅",
+    "demo_md": "doc/demos/11-12-playwright.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 10,
+  "skills": [
+   {
+    "id": "11-02",
+    "name": "context7",
+    "status": "✅",
+    "demo_md": "doc/demos/11-02-context7.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 11,
+  "skills": [
+   {
+    "id": "10-17",
+    "name": "plugin-dev",
+    "status": "✅",
+    "demo_md": "doc/demos/10-17-plugin-dev.md",
+    "sensitive": false
+   },
+   {
+    "id": "10-08",
+    "name": "example-plugin",
+    "status": "✅",
+    "demo_md": "doc/demos/10-08-example-plugin.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 12,
+  "skills": [
+   {
+    "id": "05-08",
+    "name": "xlsx",
+    "status": "✅",
+    "demo_md": "doc/demos/05-08-xlsx.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 13,
+  "skills": [
+   {
+    "id": "09-21",
+    "name": "webapp-testing",
+    "status": "✅",
+    "demo_md": "doc/demos/09-21-webapp-testing.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 14,
+  "skills": [
+   {
+    "id": "10-12",
+    "name": "hookify",
+    "status": "🟡",
+    "demo_md": "doc/demos/10-12-hookify.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 15,
+  "skills": [
+   {
+    "id": "09-13",
+    "name": "skill-creator",
+    "status": "✅",
+    "demo_md": "doc/demos/09-13-skill-creator.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 16,
+  "skills": [
+   {
+    "id": "10-15",
+    "name": "mcp-server-dev",
+    "status": "✅",
+    "demo_md": "doc/demos/10-15-mcp-server-dev.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 17,
+  "skills": [
+   {
+    "id": "08-08",
+    "name": "gh-fix-ci",
+    "status": "✅",
+    "demo_md": "doc/demos/08-08-gh-fix-ci.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 18,
+  "skills": [
+   {
+    "id": "09-05",
+    "name": "content-research-writer",
+    "status": "✅",
+    "demo_md": "doc/demos/09-05-content-research-writer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 19,
+  "skills": [
+   {
+    "id": "11-23",
+    "name": "pyright-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-23-pyright-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 20,
+  "skills": [
+   {
+    "id": "10-06",
+    "name": "code-simplifier",
+    "status": "✅",
+    "demo_md": "doc/demos/10-06-code-simplifier.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 21,
+  "skills": [
+   {
+    "id": "03-01",
+    "name": "hello-skill",
+    "status": "✅",
+    "demo_md": "doc/demos/03-01-hello-skill.md",
+    "sensitive": false
+   },
+   {
+    "id": "09-18",
+    "name": "template-skill",
+    "status": "✅",
+    "demo_md": "doc/demos/09-18-template-skill.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 22,
+  "skills": [
+   {
+    "id": "03-02",
+    "name": "book-note-organizer",
+    "status": "✅",
+    "demo_md": "doc/demos/03-02-book-note-organizer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 23,
+  "skills": [
+   {
+    "id": "03-03",
+    "name": "meeting-minutes",
+    "status": "✅",
+    "demo_md": "doc/demos/03-03-meeting-minutes.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 24,
+  "skills": [
+   {
+    "id": "04-01",
+    "name": "email-reply-helper",
+    "status": "✅",
+    "demo_md": "doc/demos/04-01-email-reply-helper.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 25,
+  "skills": [
+   {
+    "id": "04-02",
+    "name": "sidebar-web",
+    "status": "✅",
+    "demo_md": "doc/demos/04-02-sidebar-web.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 26,
+  "skills": [
+   {
+    "id": "05-02",
+    "name": "auto-research-claw",
+    "status": "🟡",
+    "demo_md": "doc/demos/05-02-auto-research-claw.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 27,
+  "skills": [
+   {
+    "id": "05-05",
+    "name": "notebooklm",
+    "status": "✅",
+    "demo_md": "doc/demos/05-05-notebooklm.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 28,
+  "skills": [
+   {
+    "id": "07-01",
+    "name": "create-plan",
+    "status": "✅",
+    "demo_md": "doc/demos/07-01-create-plan.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 29,
+  "skills": [
+   {
+    "id": "07-02",
+    "name": "email-draft-polish",
+    "status": "✅",
+    "demo_md": "doc/demos/07-02-email-draft-polish.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 30,
+  "skills": [
+   {
+    "id": "07-03",
+    "name": "file-organizer",
+    "status": "✅",
+    "demo_md": "doc/demos/07-03-file-organizer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 31,
+  "skills": [
+   {
+    "id": "07-04",
+    "name": "internal-comms",
+    "status": "✅",
+    "demo_md": "doc/demos/07-04-internal-comms.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 32,
+  "skills": [
+   {
+    "id": "07-05",
+    "name": "invoice-organizer",
+    "status": "✅",
+    "demo_md": "doc/demos/07-05-invoice-organizer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 33,
+  "skills": [
+   {
+    "id": "07-06",
+    "name": "meeting-insights-analyzer",
+    "status": "✅",
+    "demo_md": "doc/demos/07-06-meeting-insights-analyzer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 34,
+  "skills": [
+   {
+    "id": "07-07",
+    "name": "meeting-notes-and-actions",
+    "status": "✅",
+    "demo_md": "doc/demos/07-07-meeting-notes-and-actions.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 35,
+  "skills": [
+   {
+    "id": "07-09",
+    "name": "spreadsheet-formula-helper",
+    "status": "✅",
+    "demo_md": "doc/demos/07-09-spreadsheet-formula-helper.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 36,
+  "skills": [
+   {
+    "id": "08-01",
+    "name": "changelog-generator",
+    "status": "✅",
+    "demo_md": "doc/demos/08-01-changelog-generator.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 37,
+  "skills": [
+   {
+    "id": "08-07",
+    "name": "gh-address-comments",
+    "status": "✅",
+    "demo_md": "doc/demos/08-07-gh-address-comments.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 38,
+  "skills": [
+   {
+    "id": "09-01",
+    "name": "brand-guidelines",
+    "status": "✅",
+    "demo_md": "doc/demos/09-01-brand-guidelines.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 39,
+  "skills": [
+   {
+    "id": "09-02",
+    "name": "canvas-design",
+    "status": "✅",
+    "demo_md": "doc/demos/09-02-canvas-design.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 40,
+  "skills": [
+   {
+    "id": "09-07",
+    "name": "domain-name-brainstormer",
+    "status": "✅",
+    "demo_md": "doc/demos/09-07-domain-name-brainstormer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 41,
+  "skills": [
+   {
+    "id": "09-08",
+    "name": "image-enhancer",
+    "status": "✅",
+    "demo_md": "doc/demos/09-08-image-enhancer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 42,
+  "skills": [
+   {
+    "id": "09-12",
+    "name": "raffle-winner-picker",
+    "status": "✅",
+    "demo_md": "doc/demos/09-12-raffle-winner-picker.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 43,
+  "skills": [
+   {
+    "id": "09-14",
+    "name": "skill-installer",
+    "status": "✅",
+    "demo_md": "doc/demos/09-14-skill-installer.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 44,
+  "skills": [
+   {
+    "id": "09-16",
+    "name": "support-ticket-triage",
+    "status": "✅",
+    "demo_md": "doc/demos/09-16-support-ticket-triage.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 45,
+  "skills": [
+   {
+    "id": "09-17",
+    "name": "tailored-resume-generator",
+    "status": "✅",
+    "demo_md": "doc/demos/09-17-tailored-resume-generator.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 46,
+  "skills": [
+   {
+    "id": "09-19",
+    "name": "theme-factory",
+    "status": "✅",
+    "demo_md": "doc/demos/09-19-theme-factory.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 47,
+  "skills": [
+   {
+    "id": "09-20",
+    "name": "video-downloader",
+    "status": "✅",
+    "demo_md": "doc/demos/09-20-video-downloader.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 48,
+  "skills": [
+   {
+    "id": "10-01",
+    "name": "agent-sdk-dev",
+    "status": "✅",
+    "demo_md": "doc/demos/10-01-agent-sdk-dev.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 49,
+  "skills": [
+   {
+    "id": "10-02",
+    "name": "claude-code-setup",
+    "status": "✅",
+    "demo_md": "doc/demos/10-02-claude-code-setup.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 50,
+  "skills": [
+   {
+    "id": "10-03",
+    "name": "claude-md-management",
+    "status": "✅",
+    "demo_md": "doc/demos/10-03-claude-md-management.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 51,
+  "skills": [
+   {
+    "id": "10-04",
+    "name": "code-modernization",
+    "status": "✅",
+    "demo_md": "doc/demos/10-04-code-modernization.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 52,
+  "skills": [
+   {
+    "id": "10-07",
+    "name": "commit-commands",
+    "status": "✅",
+    "demo_md": "doc/demos/10-07-commit-commands.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 53,
+  "skills": [
+   {
+    "id": "10-09",
+    "name": "explanatory-output-style",
+    "status": "✅",
+    "demo_md": "doc/demos/10-09-explanatory-output-style.md",
+    "sensitive": false
+   },
+   {
+    "id": "10-13",
+    "name": "learning-output-style",
+    "status": "✅",
+    "demo_md": "doc/demos/10-13-learning-output-style.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 54,
+  "skills": [
+   {
+    "id": "10-14",
+    "name": "math-olympiad",
+    "status": "✅",
+    "demo_md": "doc/demos/10-14-math-olympiad.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 55,
+  "skills": [
+   {
+    "id": "10-16",
+    "name": "playground",
+    "status": "✅",
+    "demo_md": "doc/demos/10-16-playground.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 56,
+  "skills": [
+   {
+    "id": "10-18",
+    "name": "pr-review-toolkit",
+    "status": "✅",
+    "demo_md": "doc/demos/10-18-pr-review-toolkit.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 57,
+  "skills": [
+   {
+    "id": "10-20",
+    "name": "security-guidance",
+    "status": "✅",
+    "demo_md": "doc/demos/10-20-security-guidance.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 58,
+  "skills": [
+   {
+    "id": "10-21",
+    "name": "session-report",
+    "status": "✅",
+    "demo_md": "doc/demos/10-21-session-report.md",
+    "sensitive": true
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 59,
+  "skills": [
+   {
+    "id": "10-22",
+    "name": "skill-creator",
+    "status": "✅",
+    "demo_md": "doc/demos/10-22-skill-creator.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 60,
+  "skills": [
+   {
+    "id": "11-04",
+    "name": "fakechat",
+    "status": "✅",
+    "demo_md": "doc/demos/11-04-fakechat.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 61,
+  "skills": [
+   {
+    "id": "11-06",
+    "name": "github",
+    "status": "✅",
+    "demo_md": "doc/demos/11-06-github.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 62,
+  "skills": [
+   {
+    "id": "11-13",
+    "name": "serena",
+    "status": "🟡",
+    "demo_md": "doc/demos/11-13-serena.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 63,
+  "skills": [
+   {
+    "id": "11-16",
+    "name": "clangd-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-16-clangd-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 64,
+  "skills": [
+   {
+    "id": "11-17",
+    "name": "csharp-lsp",
+    "status": "🟡",
+    "demo_md": "doc/demos/11-17-csharp-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 65,
+  "skills": [
+   {
+    "id": "11-18",
+    "name": "gopls-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-18-gopls-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 66,
+  "skills": [
+   {
+    "id": "11-19",
+    "name": "jdtls-lsp",
+    "status": "🟡",
+    "demo_md": "doc/demos/11-19-jdtls-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 67,
+  "skills": [
+   {
+    "id": "11-20",
+    "name": "kotlin-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-20-kotlin-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 68,
+  "skills": [
+   {
+    "id": "11-21",
+    "name": "lua-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-21-lua-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 69,
+  "skills": [
+   {
+    "id": "11-22",
+    "name": "php-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-22-php-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 70,
+  "skills": [
+   {
+    "id": "11-24",
+    "name": "ruby-lsp",
+    "status": "✅",
+    "demo_md": "doc/demos/11-24-ruby-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 71,
+  "skills": [
+   {
+    "id": "11-25",
+    "name": "rust-analyzer-lsp",
+    "status": "🟡",
+    "demo_md": "doc/demos/11-25-rust-analyzer-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 72,
+  "skills": [
+   {
+    "id": "11-27",
+    "name": "typescript-lsp",
+    "status": "🟡",
+    "demo_md": "doc/demos/11-27-typescript-lsp.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ },
+ {
+  "ep": 73,
+  "skills": [
+   {
+    "id": "p169",
+    "name": "ai-teaching-video／ai-agent-orchestrator",
+    "status": "🟡",
+    "demo_md": "doc/demos/p169-ai-teaching-video.md",
+    "sensitive": false
+   }
+  ],
+  "state": "pending"
+ }
+]

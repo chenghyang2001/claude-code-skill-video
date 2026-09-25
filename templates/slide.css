@@ -1,0 +1,24 @@
+/* 投影片樣式：沿用 p169 已驗證版本（1920x1080，底部 200px 留給字幕） */
+*{margin:0;box-sizing:border-box}
+body{width:1920px;height:1080px;background:linear-gradient(135deg,#0f1b2d,#1b2f4b);font-family:'Microsoft JhengHei',sans-serif;color:#eef3fb;overflow:hidden;position:relative}
+
+.bar{position:absolute;top:0;left:0;right:0;height:10px;background:linear-gradient(90deg,#3776ab,#ffd43b)}
+
+.ep{position:absolute;top:44px;right:80px;font-size:28px;color:#9fb3cf;letter-spacing:2px}
+
+.h{position:absolute;top:70px;left:100px;right:100px}
+.h h1{font-size:76px;font-weight:800}
+.h p{font-size:38px;color:#ffd43b;margin-top:14px}
+
+pre{position:absolute;top:290px;left:100px;right:100px;height:560px;background:#0b1220;border:2px solid #2b4466;border-radius:22px;padding:40px 54px;font-family:Consolas,'Microsoft JhengHei',monospace;font-size:40px;line-height:1.45;color:#e6edf3;white-space:pre;overflow:hidden}
+
+.c{color:#7d8fa6}
+.k{color:#ff7b72}
+.s{color:#a5d6ff}
+.f{color:#d2a8ff}
+
+.t{position:absolute;top:0;left:0;right:0;bottom:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+
+.t .py{font-size:44px;color:#ffd43b;letter-spacing:6px}
+.t h1{font-size:128px;font-weight:900;margin:24px 0}
+.t p{font-size:48px;color:#c9d7ea}

@@ -1,0 +1,13 @@
+.env
+state.json
+*.stackdump
+core
+!core/
+*.core
+*.dmp
+__pycache__/
+.pytest_cache/
+.venv/
+work/
+*.mp4
+*.mp3
