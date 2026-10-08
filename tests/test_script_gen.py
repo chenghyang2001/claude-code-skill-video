@@ -170,3 +170,92 @@ def test_demo_noise_lines_are_stripped(cfg):
     sources = script_gen.collect_sources(cfg.kindle_repo, make_topics(1)[0])
     assert "node_modules" not in sources[0].demo_text
     assert "make-q3.js" in sources[0].demo_text
+
+
+# ---- claude 登入失效（2026-10-08 VPS OAuth 過期事故）----
+_AUTH_STDOUT = json.dumps({
+    "type": "result", "subtype": "success", "is_error": True,
+    "result": "Failed to authenticate: OAuth session expired and could not be refreshed",
+    "duration_api_ms": 0,
+})
+
+
+def test_call_claude_auth_failure_raises_immediately_without_retry(monkeypatch):
+    """重現事故：結束碼 1、stdout 為 is_error 的 JSON → 必須立刻拋 ClaudeAuthError，不可重試。"""
+    calls = []
+
+    def auth_fail(cmd, timeout, input_text=None, cwd=None, env=None):
+        calls.append(cmd)
+        raise ExternalCommandError(f"claude 結束碼 1：{_AUTH_STDOUT}")
+
+    monkeypatch.setattr(script_gen, "run_external", auth_fail)
+    with pytest.raises(script_gen.ClaudeAuthError):
+        script_gen.call_claude("claude", "p")
+    assert len(calls) == 1
+
+
+def test_call_claude_non_auth_errors_still_retry_as_script_gen_error(monkeypatch):
+    """一般錯誤（rate limit、result 非 JSON）仍走原本重試路徑，不可被誤判為登入失效。"""
+    calls = []
+
+    def flaky(cmd, timeout, input_text=None, cwd=None, env=None):
+        calls.append(cmd)
+        if len(calls) == 1:
+            raise ExternalCommandError("claude 結束碼 1：rate limit exceeded, please retry later")
+        return subprocess.CompletedProcess(cmd, 0, stdout=json.dumps({"is_error": False, "result": "不是 JSON"}),
+                                           stderr="")
+
+    monkeypatch.setattr(script_gen, "run_external", flaky)
+    with pytest.raises(ScriptGenError, match="連續失敗") as excinfo:
+        script_gen.call_claude("claude", "p")
+    assert not isinstance(excinfo.value, script_gen.ClaudeAuthError)
+    assert len(calls) == 2
+    assert not script_gen.is_claude_auth_failure("authorization header missing")
+
+
+def test_call_claude_auth_in_stdout_detected_despite_stderr_noise(monkeypatch):
+    """回歸：stderr 有雜訊時例外訊息只含 stderr，必須改看 exc.stdout 的 is_error JSON 才不會漏判。"""
+    calls = []
+
+    def auth_fail(cmd, timeout, input_text=None, cwd=None, env=None):
+        calls.append(cmd)
+        raise ExternalCommandError("claude 結束碼 1：(node:123) Warning: some deprecation noise",
+                                   stdout=_AUTH_STDOUT, stderr="(node:123) Warning: some deprecation noise")
+
+    monkeypatch.setattr(script_gen, "run_external", auth_fail)
+    with pytest.raises(script_gen.ClaudeAuthError):
+        script_gen.call_claude("claude", "p")
+    assert len(calls) == 1
+
+
+def test_call_claude_auth_in_stderr_api_401_detected(monkeypatch):
+    """claude CLI 另一種 401 輸出（authentication_error）寫在 stderr、stdout 為空，也要判成登入失效。"""
+    calls = []
+    api_401 = 'API Error: 401 {"type":"error","error":{"type":"authentication_error","message":"x"}}'
+
+    def auth_fail(cmd, timeout, input_text=None, cwd=None, env=None):
+        calls.append(cmd)
+        raise ExternalCommandError("claude 結束碼 1：noise", stdout="", stderr=api_401)
+
+    monkeypatch.setattr(script_gen, "run_external", auth_fail)
+    with pytest.raises(script_gen.ClaudeAuthError):
+        script_gen.call_claude("claude", "p")
+    assert len(calls) == 1
+    assert script_gen.is_claude_auth_failure("OAuth token revoked")
+    assert script_gen.is_claude_auth_failure("OAuth token has been revoked")
+
+
+def test_parse_claude_output_success_mentioning_not_logged_in_is_not_auth_error():
+    """守門：is_error=false 時腳本內容提到「not logged in」是正常文字，不可誤判成登入失效。"""
+    script = make_script()
+    script["description"] = "教你處理 claude 顯示 not logged in 的情況"
+    stdout = json.dumps({"is_error": False, "result": json.dumps(script, ensure_ascii=False)},
+                        ensure_ascii=False)
+    parsed = script_gen.parse_claude_output(stdout)
+    assert parsed["description"] == script["description"]
+
+
+def test_parse_claude_output_is_error_auth_raises_claude_auth_error():
+    """結束碼 0 但 stdout 為 is_error + 登入片語 → parse_claude_output 直接拋 ClaudeAuthError。"""
+    with pytest.raises(script_gen.ClaudeAuthError):
+        script_gen.parse_claude_output(_AUTH_STDOUT)

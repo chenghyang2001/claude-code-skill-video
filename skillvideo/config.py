@@ -69,7 +69,16 @@ class ConfigError(Exception):
 
 
 class ExternalCommandError(Exception):
-    """外部指令（claude / ffmpeg / chrome）執行失敗。"""
+    """外部指令（claude / ffmpeg / chrome）執行失敗。
+
+    stdout / stderr 保留完整原文：訊息只放尾段摘要，呼叫端若要判斷失敗原因
+    （例如 claude 把登入失效寫在 stdout JSON、stderr 卻有其他雜訊）必須看原文。
+    """
+
+    def __init__(self, message: str, stdout: Optional[str] = "", stderr: Optional[str] = "") -> None:
+        super().__init__(message)
+        self.stdout = stdout or ""
+        self.stderr = stderr or ""
 
 
 @dataclass
@@ -352,5 +361,5 @@ def run_external(
     stdout, stderr = _communicate(proc, input_text, timeout, name)
     if proc.returncode != 0:
         detail = tail_text(stderr) or tail_text(stdout)
-        raise ExternalCommandError(f"{name} 結束碼 {proc.returncode}：{detail}")
+        raise ExternalCommandError(f"{name} 結束碼 {proc.returncode}：{detail}", stdout=stdout, stderr=stderr)
     return subprocess.CompletedProcess(args, proc.returncode, stdout=stdout, stderr=stderr)

@@ -32,6 +32,31 @@ class ScriptGenError(Exception):
     """腳本產生或驗證失敗。"""
 
 
+class ClaudeAuthError(ScriptGenError):
+    """claude CLI 登入失效，需人工在主機上重新登入。
+
+    與內容無關的環境問題：重試只會浪費時間，且不可累計該集失敗次數
+    （2026-10-08 VPS OAuth 過期，第 25、26 集因此被誤判失敗 3 次而永久放棄）。
+    """
+
+
+# 失敗通知要附的修復指引：收到通知的人多半不在主機前，必須一眼知道該做什麼
+CLAUDE_LOGIN_HINT = "claude 登入失效：請 SSH 到 VPS 執行 `claude` 後輸入 `/login` 重新登入，本集不累計失敗次數"
+
+# claude CLI 已知的登入失效訊息；刻意用完整片語而非單字 "auth"，避免把一般錯誤誤判成登入問題
+_AUTH_FAILURE_PATTERN = re.compile(
+    r"failed to authenticate|oauth session expired|oauth token has expired"
+    r"|oauth token (has been )?revoked|authentication_error"
+    r"|invalid api key|please run /login|not logged in",
+    re.IGNORECASE,
+)
+
+
+def is_claude_auth_failure(text: Optional[str]) -> bool:
+    """claude 輸出（stdout / stderr / 例外訊息）是否為登入失效。"""
+    return bool(text) and _AUTH_FAILURE_PATTERN.search(text) is not None
+
+
 @dataclass
 class SkillSource:
     """單一 Skill 的腳本素材。"""
@@ -176,6 +201,10 @@ def parse_claude_output(stdout: str) -> dict[str, Any]:
     except ValueError as exc:
         raise ScriptGenError(f"claude 輸出不是 JSON：{stdout[:200]}") from exc
     if not isinstance(outer, dict) or outer.get("is_error"):
+        # 結束碼 0 但 is_error 的情況也可能是登入失效，要在截斷前用完整 result 判斷
+        detail = outer.get("result") if isinstance(outer, dict) else None
+        if isinstance(detail, str) and is_claude_auth_failure(detail):
+            raise ClaudeAuthError(f"claude 登入失效：{detail[:300]}")
         raise ScriptGenError(f"claude 回報錯誤：{str(outer)[:300]}")
     result = outer.get("result")
     if not isinstance(result, str):
@@ -199,6 +228,25 @@ def claude_command(claude_bin: str) -> list[str]:
             "--max-turns", "1", "--tools", ""]
 
 
+def _raise_if_auth_failure(exc: ExternalCommandError) -> None:
+    """結束碼非 0 時判斷是否為登入失效，是則拋 ClaudeAuthError。
+
+    不能只看例外訊息：訊息只取 stderr 尾段（無 stderr 才取 stdout），stderr 只要有雜訊，
+    stdout 裡 `{"is_error":true,"result":"Failed to authenticate..."}` 就不會出現在訊息中。
+    """
+    if exc.stdout.strip():
+        try:
+            # 只用來判斷 is_error + 登入片語；成功 JSON 的回傳值刻意丟棄（結束碼已非 0，不採信內容）
+            parse_claude_output(exc.stdout)
+        except ClaudeAuthError as auth_exc:
+            raise ClaudeAuthError(str(auth_exc)) from exc
+        except ScriptGenError:
+            # stdout 不是可判讀的 claude JSON，交給下方的純文字比對
+            pass
+    if is_claude_auth_failure(exc.stderr) or is_claude_auth_failure(str(exc)):
+        raise ClaudeAuthError(f"claude 登入失效：{exc}") from exc
+
+
 def call_claude(claude_bin: str, prompt: str, cwd: Optional[Path] = None) -> dict[str, Any]:
     """呼叫 claude CLI（Max 訂閱額度）。
 
@@ -212,7 +260,14 @@ def call_claude(claude_bin: str, prompt: str, cwd: Optional[Path] = None) -> dic
         try:
             proc = run_external(cmd, timeout=CLAUDE_TIMEOUT, input_text=prompt, cwd=cwd, env=env)
             return parse_claude_output(proc.stdout)
-        except (ExternalCommandError, ScriptGenError) as exc:
+        except ClaudeAuthError:
+            # 登入失效重試必定再失敗，立即往上拋讓排程中止且不累計 attempts
+            raise
+        except ExternalCommandError as exc:
+            _raise_if_auth_failure(exc)
+            last_error = exc
+            logger.warning("claude 呼叫失敗（第 %d/%d 次）：%s", attempt, CLAUDE_ATTEMPTS, exc)
+        except ScriptGenError as exc:
             last_error = exc
             logger.warning("claude 呼叫失敗（第 %d/%d 次）：%s", attempt, CLAUDE_ATTEMPTS, exc)
     raise ScriptGenError(f"claude 連續失敗：{last_error}")

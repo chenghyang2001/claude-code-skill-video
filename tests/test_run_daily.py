@@ -10,7 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from conftest import make_script, make_topics
-from skillvideo import notify, qa, run_daily, state, youtube
+from skillvideo import notify, qa, run_daily, script_gen, state, youtube
 from skillvideo.config import TAIPEI_TZ
 from skillvideo.render import RenderResult
 from skillvideo.script_gen import ScriptBundle
@@ -500,3 +500,36 @@ def test_failure_after_upload_does_not_demote_episode(cfg, notifier):
     assert ctx.state["episodes"]["1"]["state"] == "uploaded"
     assert ctx.state["episodes"]["1"]["attempts"] == 0
     assert notifier.messages
+
+
+def test_claude_auth_error_aborts_without_counting_attempt(cfg, notifier, monkeypatch):
+    """重現 2026-10-08 事故：claude 登入失效不可累計 attempts，且本輪後續 slot 不再製作。"""
+    ctx = make_ctx(cfg, notifier)
+    calls = []
+
+    def auth_fail(c, ep, slot):
+        calls.append(ep)
+        raise script_gen.ClaudeAuthError("claude 登入失效：Failed to authenticate: OAuth session expired")
+
+    monkeypatch.setattr(run_daily, "make_assets", auth_fail)
+    assert run_daily.process_slot(ctx, 1, SLOTS[0]) == run_daily.RESULT_ABORT
+    assert ctx.state["episodes"]["1"]["attempts"] == 0
+    assert ctx.state["episodes"]["1"]["state"] == "pending"
+    assert "/login" in notifier.messages[-1][1]
+    assert run_daily.run_command(ctx, SLOTS) == run_daily.EXIT_FAILED
+    assert calls == [1, 1]
+
+
+def test_claude_auth_error_keeps_existing_attempts(cfg, notifier, monkeypatch):
+    """已失敗 2 次的集數遇登入失效：attempts 維持 2、state 仍為 failed，不可被推到第 3 次而永久放棄。"""
+    ctx = make_ctx(cfg, notifier)
+    ctx.state["episodes"]["1"].update(state="failed", attempts=2)
+
+    def auth_fail(c, ep, slot):
+        raise script_gen.ClaudeAuthError("claude 登入失效：Failed to authenticate")
+
+    monkeypatch.setattr(run_daily, "make_assets", auth_fail)
+    assert run_daily.process_slot(ctx, 1, SLOTS[0]) == run_daily.RESULT_ABORT
+    assert ctx.state["episodes"]["1"]["attempts"] == 2
+    assert ctx.state["episodes"]["1"]["state"] == "failed"
+    assert "/login" in notifier.messages[-1][1]

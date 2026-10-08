@@ -282,6 +282,9 @@ def produce_episode(ctx: RunContext, ep: int, slot: Slot) -> None:
 def handle_failure(ctx: RunContext, ep: int, slot: Slot, exc: BaseException, count_attempt: bool = True) -> None:
     """記錄 failed（dry-run 不寫 state）並通知；距公開不到 2 小時標示開天窗。"""
     error_text = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    if isinstance(exc, script_gen.ClaudeAuthError):
+        # 附在結尾而非開頭：format_failure 只取最後 20 行，放開頭會被長 traceback 截掉
+        error_text += f"\n{script_gen.CLAUDE_LOGIN_HINT}"
     item = state.entry(ctx.state, ep)
     attempts = int(item.get("attempts") or 0)
     # 已有影片（uploaded / scheduled / published）時不可改回 failed，否則下次會被重新排片上傳
@@ -316,6 +319,11 @@ def process_slot(ctx: RunContext, ep: int, slot: Slot) -> str:
     except AlreadyPublishedError as exc:
         ctx.notifier.send(f"[影片流水線] 第 {ep} 集早已公開，本 slot 未排入", str(exc))
         return RESULT_FAILED
+    except script_gen.ClaudeAuthError as exc:
+        # claude 登入失效後續 slot 必定同樣失敗，不累計 attempts 並中止本輪，等人工重新登入
+        logger.error("第 %d 集因 claude 登入失效中止：%s", ep, exc)
+        handle_failure(ctx, ep, slot, exc, count_attempt=False)
+        return RESULT_ABORT
     except (youtube.QuotaExceededError, youtube.AuthError) as exc:
         # 配額 / 授權不是本集內容的問題，不累計 attempts，並停止後續上傳
         logger.error("第 %d 集因 %s 中止：%s", ep, type(exc).__name__, exc)

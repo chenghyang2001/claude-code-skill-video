@@ -189,6 +189,29 @@ def test_run_external_nonzero_includes_stderr(monkeypatch):
         config.run_external(["ffmpeg"], timeout=1)
 
 
+def test_run_external_nonzero_keeps_full_stdout_and_stderr(monkeypatch):
+    """例外訊息只放 stderr 尾段，但呼叫端判斷失敗原因需要完整 stdout / stderr 原文。"""
+    def factory(args, **kwargs):
+        proc = FakePopen(args, **kwargs)
+        proc.returncode = 1
+        proc.stdout_text, proc.stderr_text = '{"is_error":true,"result":"Failed to authenticate"}', "雜訊"
+        return proc
+
+    monkeypatch.setattr(config.subprocess, "Popen", factory)
+    with pytest.raises(ExternalCommandError) as excinfo:
+        config.run_external(["claude"], timeout=1)
+    assert "Failed to authenticate" in excinfo.value.stdout
+    assert excinfo.value.stderr == "雜訊"
+    assert "Failed to authenticate" not in str(excinfo.value)
+
+
+def test_external_command_error_defaults_to_empty_streams():
+    """既有只傳訊息的 raise 點（逾時、無法執行）stdout / stderr 為空字串，None 也轉空字串。"""
+    assert ExternalCommandError("x").stdout == ""
+    exc = ExternalCommandError("x", stdout=None, stderr=None)
+    assert (exc.stdout, exc.stderr, str(exc)) == ("", "", "x")
+
+
 def test_filtered_child_env_strips_secrets():
     env = {"PATH": "/bin", "HOME": "/h", "ANTHROPIC_API_KEY": "x", "ANTHROPIC_AUTH_TOKEN": "y",
            "ANTHROPIC_MODEL": "m", "GMAIL_APP_PASSWORD": "p", "TELEGRAM_BOT_TOKEN": "t",
