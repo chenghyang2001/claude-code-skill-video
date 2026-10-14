@@ -5,6 +5,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Optional
 
@@ -314,8 +315,19 @@ def _validate_meta(script: dict[str, Any]) -> list[str]:
     return errors
 
 
-def validate_script(script: Any) -> list[str]:
-    """回傳錯誤清單（空清單代表通過）。"""
+def count_sentences(script: Any) -> int:
+    """所有段落 n 陣列的句數總和（型別不對的段落不計）。"""
+    if not isinstance(script, dict) or not isinstance(script.get("scenes"), list):
+        return 0
+    return sum(len(s["n"]) for s in script["scenes"] if isinstance(s, dict) and isinstance(s.get("n"), list))
+
+
+def validate_script(script: Any, sentence_count: Optional[int] = None) -> list[str]:
+    """回傳錯誤清單（空清單代表通過）。
+
+    sentence_count：總句數檢查改用此值（generate_script 傳入「自動切分前」的句數）；
+    None 時照舊以腳本現有句數計算。
+    """
     if not isinstance(script, dict):
         return ["腳本必須是 JSON 物件"]
     errors = _validate_meta(script)
@@ -326,10 +338,89 @@ def validate_script(script: Any) -> list[str]:
         errors.append(f"段數 {len(scenes)} 不在 {SCENES_MIN}～{SCENES_MAX}")
     for idx, scene in enumerate(scenes):
         errors.extend(_validate_scene(idx, scene))
-    total = sum(len(s.get("n") or []) for s in scenes if isinstance(s, dict) and isinstance(s.get("n"), list))
+    total = count_sentences(script) if sentence_count is None else sentence_count
     if not SENTENCES_MIN <= total <= SENTENCES_MAX:
         errors.append(f"旁白總句數 {total} 不在 {SENTENCES_MIN}～{SENTENCES_MAX}")
     return errors
+
+
+# ---- 過長旁白句自動切分 ----
+# claude 常寫出 41～60 字的長句，整集因此重生兩次仍失敗（第 36 集連敗 4 次）；
+# 句中本來就有逗號等停頓點，在那裡切成兩句不改語意，比要求 claude 重寫可靠
+# 每組為（全形標點, 半形標點）。半形 ,;:!? 常出現在數字（12,345）、時間（10:30）、
+# 網址（https://）與程式碼（a != b）裡，切開會讓 qa.py 的數字外洩檢查抓不到完整數字，
+# 所以半形只在後面緊接空白（英文斷句習慣）時才算切點
+_SOFT_BREAKS = ("，、；：", ",;:")
+# 句號類是更強的停頓，但切在這裡等於改變原句節奏，只在沒有逗號類可切時才用
+_HARD_BREAKS = ("。！？", "!?")
+# 超過上限 4 倍的句子多半是 claude 失控，切成 5 句以上也不像旁白，直接交給驗證報錯
+_SPLIT_MAX_INPUT = SENTENCE_MAX_CHARS * 4
+
+
+def _cut_candidates(sentence: str, marks: tuple[str, str]) -> list[int]:
+    """可切位置（切在標點之後），依「前段長度離中間多近」排序。"""
+    full_width, half_width = marks
+    middle = len(sentence) / 2
+    positions = [i + 1 for i, ch in enumerate(sentence[:-1])
+                 if ch in full_width or (ch in half_width and sentence[i + 1].isspace())]
+    return sorted(positions, key=lambda pos: abs(pos - middle))
+
+
+@lru_cache(maxsize=4096)
+def _split_cached(sentence: str) -> Optional[tuple[str, ...]]:
+    """_split_sentence 的記憶化核心。
+
+    切不開時會回溯嘗試所有切點，未記憶化在「甲、」×20＋長尾這種句子上是指數級（實測 5 秒以上，
+    排程會卡死）；遞迴參數都是原句去頭後的尾段，以字串記憶化後最多 O(n) 種狀態、整體 O(n²)。
+    """
+    if len(sentence) <= SENTENCE_MAX_CHARS:
+        return (sentence,)
+    if len(sentence) > _SPLIT_MAX_INPUT:
+        return None
+    for marks in (_SOFT_BREAKS, _HARD_BREAKS):
+        for pos in _cut_candidates(sentence, marks):
+            head, tail = sentence[:pos].strip(), sentence[pos:].strip()
+            if not head or not tail or len(head) > SENTENCE_MAX_CHARS:
+                continue
+            rest = _split_cached(tail)
+            if rest is not None:
+                return (head, *rest)
+    return None
+
+
+def _split_sentence(sentence: str) -> Optional[list[str]]:
+    """把單句切成每段 ≤ SENTENCE_MAX_CHARS 的多句；切不出來回傳 None。
+
+    依序嘗試離中間最近的切點，前段（含尾端標點）必須 ≤ 上限，後段仍過長就遞迴再切；
+    某個切點讓後段切不下去時改試下一個切點，不硬切字。
+    """
+    pieces = _split_cached(sentence)
+    return list(pieces) if pieces is not None else None
+
+
+def _split_long_sentences(script: Any) -> int:
+    """就地切分各段 n 裡的過長旁白句，回傳被切分的原句數。
+
+    下游 render 以「一句一個 TTS 音檔＋一張字幕畫面」展開，句子變多只是多幾個片段，順序不變。
+    非字串元素與切不開的句子原樣保留，交給 validate_script 照舊報錯；
+    切分會讓總句數增加，呼叫端應以切分前的 count_sentences 結果做總句數檢查。
+    """
+    if not isinstance(script, dict) or not isinstance(script.get("scenes"), list):
+        return 0
+    split_count = 0
+    for scene in script["scenes"]:
+        if not isinstance(scene, dict) or not isinstance(scene.get("n"), list):
+            continue
+        new_narration: list[Any] = []
+        for sentence in scene["n"]:
+            pieces = _split_sentence(sentence) if isinstance(sentence, str) else None
+            if pieces is None or len(pieces) == 1:
+                new_narration.append(sentence)
+                continue
+            new_narration.extend(pieces)
+            split_count += 1
+        scene["n"] = new_narration
+    return split_count
 
 
 # ---- 主入口 ----
@@ -343,7 +434,13 @@ def generate_script(cfg: Config, topic: dict[str, Any], ep_dir: Path) -> ScriptB
     feedback: Optional[list[str]] = None
     for attempt in range(1, GENERATION_ATTEMPTS + 1):
         script = call_claude(cfg.claude_bin, build_prompt(ep, sources, feedback), cwd=ep_dir)
-        feedback = validate_script(script)
+        # 總句數上限是在控制影片長度（朗讀約 5 分鐘）；切分只是把同樣的字拆成多段，
+        # 不增加朗讀時間，所以用切分前的句數判斷，否則接近 70 句的腳本切完反而被判超標
+        original_count = count_sentences(script)
+        split_count = _split_long_sentences(script)
+        if split_count:
+            logger.info("第 %d 集腳本自動切分 %d 句過長旁白（第 %d 次產生）", ep, split_count, attempt)
+        feedback = validate_script(script, sentence_count=original_count)
         if not feedback:
             out = ep_dir / "scenes.json"
             out.write_text(json.dumps(script, ensure_ascii=False, indent=1), encoding="utf-8")

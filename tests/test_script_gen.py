@@ -3,11 +3,12 @@ from __future__ import annotations
 
 import json
 import subprocess
+import time
 
 import pytest
 
 from conftest import make_script, make_topics
-from skillvideo import script_gen
+from skillvideo import qa, script_gen
 from skillvideo.config import ExternalCommandError
 from skillvideo.script_gen import ScriptGenError
 
@@ -259,3 +260,84 @@ def test_parse_claude_output_is_error_auth_raises_claude_auth_error():
     """結束碼 0 但 stdout 為 is_error + 登入片語 → parse_claude_output 直接拋 ClaudeAuthError。"""
     with pytest.raises(script_gen.ClaudeAuthError):
         script_gen.parse_claude_output(_AUTH_STDOUT)
+
+
+# ---- 過長旁白句自動切分（第 36 集連敗的回歸測試）----
+_LONG_ZH = "甲" * 20 + "，" + "乙" * 15 + "，" + "丙" * 15                      # 52 字
+_LONG_WITH_TOKENS = "總共 12,345 筆資料，在 10:30 從 https://example.com 抓下來，再整理成報表"  # 54 字
+_LONG_HALF_ONLY = "版本 1,234,567 在 10:30:45 發布於 https://example.com/a,b;c 條件 a != b 成立請大家參考看看"
+
+
+def test_split_long_sentence_at_fullwidth_comma():
+    script = make_script()
+    script["scenes"][2]["n"][1] = _LONG_ZH
+    before = list(script["scenes"][2]["n"])
+    assert script_gen._split_long_sentences(script) == 1
+    after = script["scenes"][2]["n"]
+    pieces = after[1:-(len(before) - 2)]
+    assert "".join(pieces) == _LONG_ZH
+    assert len(pieces) >= 2 and all(len(p) <= script_gen.SENTENCE_MAX_CHARS for p in pieces)
+    # 其他句子順序與內容不變
+    assert after[0] == before[0] and after[len(pieces) + 1:] == before[2:]
+    assert script_gen.validate_script(script) == []
+
+
+def test_split_halfwidth_needs_following_space():
+    assert script_gen._split_sentence("a" * 30 + ", " + "b" * 20) == ["a" * 30 + ",", "b" * 20]
+
+
+def test_split_does_not_break_numbers_time_or_url():
+    assert len(_LONG_WITH_TOKENS) > script_gen.SENTENCE_MAX_CHARS
+    pieces = script_gen._split_sentence(_LONG_WITH_TOKENS)
+    assert pieces is not None and len(pieces) >= 2
+    assert all(len(p) <= script_gen.SENTENCE_MAX_CHARS for p in pieces)
+    for token in ("12,345", "10:30", "https://example.com"):
+        assert any(token in p for p in pieces), token
+    # 只有夾在數字／網址／程式碼中的半形標點 → 沒有合法切點，保留原句交給驗證報錯
+    assert len(_LONG_HALF_ONLY) > script_gen.SENTENCE_MAX_CHARS
+    assert script_gen._split_sentence(_LONG_HALF_ONLY) is None
+    script = make_script()
+    script["scenes"][1]["n"][0] = _LONG_HALF_ONLY
+    assert script_gen._split_long_sentences(script) == 0
+    assert script["scenes"][1]["n"][0] == _LONG_HALF_ONLY
+
+
+def test_split_keeps_qa_number_extraction_unchanged():
+    """不變式：切分前後 qa 的數字外洩檢查抓到的數字完全相同（敏感集靠它擋 Demo 數據）。"""
+    sentences = [_LONG_ZH, _LONG_WITH_TOKENS, _LONG_HALF_ONLY,
+                 "金額 12, 345 元，" + "後" * 30, "a" * 30 + ", " + "b" * 20]
+    script = make_script()
+    script["scenes"][3]["n"] = list(sentences)
+    before = sorted(qa._NUMBER_RE.findall("\n".join(sentences)))
+    assert script_gen._split_long_sentences(script) == 4
+    after = sorted(qa._NUMBER_RE.findall("\n".join(script["scenes"][3]["n"])))
+    assert after == before
+
+
+def test_split_unsplittable_sentence_is_fast_and_kept():
+    sentence = "甲、" * 30 + "乙" * 41
+    script_gen._split_cached.cache_clear()
+    start = time.perf_counter()
+    assert script_gen._split_sentence(sentence) is None
+    assert time.perf_counter() - start < 1.0
+    script = make_script()
+    script["scenes"][4]["n"][0] = sentence
+    assert script_gen._split_long_sentences(script) == 0
+    assert script["scenes"][4]["n"][0] == sentence
+    # 超過上限 4 倍直接放棄，不做任何嘗試
+    assert script_gen._split_sentence("甲、" * 100) is None
+
+
+def test_generate_script_checks_total_before_split(cfg, monkeypatch, tmp_path):
+    """原始 68 句、5 句過長切成兩句後變 73 句：總句數以切分前為準，不應因此失敗。"""
+    script = make_script(scene_count=8, per_scene=8)
+    script["scenes"][0]["n"] += [f"補充第 {j} 句。" for j in range(4)]
+    for idx in range(1, 6):
+        script["scenes"][idx]["n"][0] = "前" * 25 + "，" + "後" * 20
+    assert script_gen.count_sentences(script) == 68
+    monkeypatch.setattr(script_gen, "call_claude", lambda *a, **k: script)
+    bundle = script_gen.generate_script(cfg, make_topics(1)[0], tmp_path / "ep")
+    assert script_gen.count_sentences(bundle.script) == 73
+    assert (tmp_path / "ep" / "scenes.json").is_file()
+    # 未傳 sentence_count 時沿用現行計算，73 句會被擋（證明是參數讓它通過）
+    assert any("總句數 73" in e for e in script_gen.validate_script(bundle.script))
