@@ -1,5 +1,5 @@
 # Claude Code Skill 技術探討：每日自動影片
-edge-tts>=6.1
+edge-tts>=7.3  # 7.2.x 於 2026-10 起被微軟回 403
 Pillow>=10.0
 google-api-python-client>=2.100
 google-auth>=2.23
